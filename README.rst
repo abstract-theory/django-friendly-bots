@@ -48,9 +48,8 @@ to unistall:
 
 
 Setup
-------------------------------------------
-Django-Friendly-Bots uses Django caching suite to store IP addresses and whether or not the IP is a good or bad bot. To use this library,
- you must have a caching back-end named "friendly_ips" in "settings.py". An example of this is shown below.
+---------
+Django-Friendly-Bots uses Django's caching suite to store IP addresses and whether or not the IP is a good or bad bot. To use this library, you must have a caching back-end named "friendly_ips" in "settings.py". An example of this is shown below.
 
 .. code-block:: python
 
