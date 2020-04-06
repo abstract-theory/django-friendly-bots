@@ -20,6 +20,13 @@ Search crawlers are approved by being listed in the code. They are verified usin
 1. Having a white-listed IP address.
 2. Reverse DNS look-up of IP, followed by a forwards DNS look-up of resultant hostname, and then having the resultant IP address match the original IP address. For more info search on "verify googlebot".
 
+Notes of bots
+-----------------------
+For notes on various bots that are of relavance and interest to web developers, see this blog post:
+
+https://abstract-theory.github.io/notes-on-web-crawlers-for-2020.html
+
+
 Requirements
 ------------------------
 I've tested this on Django version 3.0+. I expect it to run on earlier versions.
