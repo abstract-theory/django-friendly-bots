@@ -1,0 +1,5 @@
+*.pyc
+__pycache__/
+dist/
+django_friendly_bots.egg-info/
+MANIFEST
