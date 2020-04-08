@@ -15,11 +15,11 @@ Bots that are verifiable, but not enabled by default:
 """
 
 from django.http import HttpResponse
+from django.views.generic import TemplateView
 from django.core.cache import caches
 import socket
 
-CACHE_NAME = 'friendly_ips'
-
+CACHE_NAME = 'friendly_bots'
 
 app_cache = caches[CACHE_NAME]
 
@@ -40,6 +40,7 @@ DUCKDUCKBOT_IPS = [
 ]
 
 # Bots with known IP addresses
+# Use a set instead of a list if there is a large number of IPs
 GOOD_IPS = DUCKDUCKBOT_IPS
 
 
@@ -169,3 +170,16 @@ def search_bots_only():
         return wrapper
     return real_decorator
 
+
+class FriendlyBotsView(TemplateView):
+    '''
+    Note: the "get" function also handles HEAD requests
+    '''
+
+    def get(self, request, *args, **kwargs):
+        remote_ip = request.META.get('REMOTE_ADDR')
+        user_agent = request.META.get('HTTP_USER_AGENT')
+        if is_good_bot(remote_ip, user_agent):
+            return super().get(self, request, *args, **kwargs)
+        else:
+            return HttpResponse(status=403)

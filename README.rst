@@ -33,7 +33,9 @@ I've tested this on Django version 3.0+. I expect it to run on earlier versions.
 
 Installation
 ------------------------
-It is probably easiest to just drop the source folder into your Django project as you would any other Django app. Django app. Because Django-Friendly-Bots behaves more like a library, it does not need to be added to INSTALLED_APPS. For completeness, the package installation instructions are written below.
+It is probably easiest to just drop the source folder into your Django project as you would any other Django app. For completeness, the package installation instructions are written below.
+
+Because Django-Friendly-Bots behaves more like a library, general usage does not require that it be added to INSTALLED_APPS. However, to run the included tests, it must listed in INSTALLED_APPS.
 
 to build:
 
@@ -56,14 +58,14 @@ to unistall:
 
 Setup
 ---------
-Django-Friendly-Bots uses Django's caching suite to store IP addresses and whether or not the IP is a good or bad bot. To use this library, you must have a caching back-end named "friendly_ips" in "settings.py". An example of this is shown below.
+Django-Friendly-Bots uses Django's caching suite to store IP addresses and whether or not the IP is a good or bad bot. To use this library, you must have a caching back-end named "friendly_bots" in "settings.py". An example of this is shown below.
 
 .. code-block:: python
 
     # settings.py
     CACHES = {
         ...
-        'friendly_ips': {
+        'friendly_bots': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             'OPTIONS': {
                 'MAX_ENTRIES': 500
@@ -85,6 +87,20 @@ This decorator will cause a status code of **403** to be returned to clients if 
         # do something
 
 
+FriendlyBotsView overrides TemplateView
+----------------------------------------
+The TemplateView class has been overriden. Using the "as_view" function returns regular pages to approved and verified bots. For everyone else, it returns a status code of **403**. Usage of "FriendlyBotsView.as_view" is illustrated below.
+
+.. code-block:: python
+
+    from friendlybots.views import FriendlyBotsView
+
+    urlpatterns = [
+        re_path(r'^hello-friendly-bots/$', FriendlyBotsView.as_view(template_name='hello-friendly-bots.html')),
+    ]
+
+
+
 Testing
 -------------------
 To run the built-in dev tests using Django's test framework, run
@@ -96,5 +112,9 @@ To run the built-in dev tests using Django's test framework, run
 
 Caveats
 -------------------
-It is possible for unapproved crawlers that are owned by companies that also own an approved crawler, to acquire access to restricted HTTP resources. For example, if Google decides to run some specialized crawler that is not explicitly approved, it might pass the credentials check if it operates under the same hostname (google.com). Also, the validity of bot verification is wholly dependent on the companies that run the bots. For example, DuckDuckGo, could add additional IP addresses, or Bing could move hosts from search.msn.com to bing.com.
+Currently, FriendlyBots is IPv4 only.
+
+It may be possible to acquire access to restricted HTTP resources if a company owning an approved crawler is running an additional unapproved bot. For example, if Google runs a service and uses an unapproved bot, it might pass the credentials check if it operates under the same hostname (google.com).
+
+Also, the validity of bot verification is wholly dependent on the companies that run the bots. For example, DuckDuckGo, could add additional IP addresses, or Bing could move hosts from search.msn.com to bing.com.
 
