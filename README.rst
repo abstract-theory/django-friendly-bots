@@ -20,9 +20,9 @@ Search crawlers are approved by being listed in the code. They are verified usin
 1. Having a white-listed IP address.
 2. Reverse DNS look-up of IP, followed by a forwards DNS look-up of resultant hostname, and then having the resultant IP address match the original IP address. For more info search on "verify googlebot".
 
-Notes of bots
+Notes on bots
 -----------------------
-For notes on various bots that are of relavance and interest to web developers, see this blog post:
+For notes on various bots that are of relevance and interest to web developers, see this blog post:
 
 https://abstract-theory.github.io/notes-on-web-crawlers-for-2020.html
 
@@ -31,11 +31,12 @@ Requirements
 ------------------------
 I've tested this on Django version 3.0+. I expect it to run on earlier versions.
 
+
 Installation
 ------------------------
 It is probably easiest to just drop the source folder into your Django project as you would any other Django app. For completeness, the package installation instructions are written below.
 
-Because Django-Friendly-Bots behaves more like a library, general usage does not require that it be added to INSTALLED_APPS. However, to run the included tests, it must listed in INSTALLED_APPS.
+Django-Friendly-Bots behaves somewhat like a library (rather than a Django app), however, to either run the included tests or use the management command, it needs to be added to INSTALLED_APPS.
 
 to build:
 
@@ -100,14 +101,22 @@ The TemplateView class has been overriden. Using the "as_view" function returns 
     ]
 
 
+Management Commands
+---------------------
+If for any reason IPs are incorrectly labels as good or bad bots (e.g. a search engine changes IP addresses), the cached IP addresses can be deleted with a management command. This is illustrated below.
+
+.. code-block:: sh
+
+    django-admin friendlybots --clear
+
 
 Testing
 -------------------
 To run the built-in dev tests using Django's test framework, run
 
-.. code-block:: bash
+.. code-block:: sh
 
-    python3 manage.py test friendlybots
+    django-admin test friendlybots
 
 
 Caveats
