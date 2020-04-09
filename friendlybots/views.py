@@ -60,22 +60,20 @@ GOOD_BOTS_HOSTNAMES = [
 
 # substring in user agents
 UA_BLOCKS_IDS = [
-    'google.com',
-    'bing.com',
+    'Googlebot',
+    'bingbot',
     'msnbot',
-    # 'pinterest.com',
+    # 'Pinterestbot',
 ]
 
 
 
 # substring in user agents
 UA_IDS = [
-    'yandex.com',
-    'yandex.ru',
-    'yandex.com',
-    'seznam.cz',
-    'apple.com',
-    # 'sogou.com',
+    'YandexBot',
+    'SeznamBot',
+    'Applebot',
+    # 'Sogou web spider',
 ]
 
 
