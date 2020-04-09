@@ -75,8 +75,11 @@ Django-Friendly-Bots uses Django's caching suite to store IP addresses and wheth
     }
 
 
+Usage
+-----
+
 The view function decorator
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This decorator will cause a status code of **403** to be returned to clients if the client is not an approved and verified search engine crawler. The decorator is placed above view functions as shown below.
 
 .. code-block:: python
@@ -89,7 +92,7 @@ This decorator will cause a status code of **403** to be returned to clients if 
 
 
 FriendlyBotsView overrides TemplateView
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The TemplateView class has been overriden. Using the "as_view" function returns regular pages to approved and verified bots. For everyone else, it returns a status code of **403**. Usage of "FriendlyBotsView.as_view" is illustrated below.
 
 .. code-block:: python
@@ -102,7 +105,7 @@ The TemplateView class has been overriden. Using the "as_view" function returns 
 
 
 Management Commands
----------------------
+^^^^^^^^^^^^^^^^^^^
 If for any reason IPs are incorrectly labels as good or bad bots (e.g. a search engine changes IP addresses), the cached IP addresses can be deleted with a management command. This is illustrated below.
 
 .. code-block:: sh
@@ -110,8 +113,8 @@ If for any reason IPs are incorrectly labels as good or bad bots (e.g. a search 
     django-admin friendlybots --clear
 
 
-Testing
--------------------
+Running Builtin Tests
+^^^^^^^^^^^^^^^^^^^^^^^
 To run the built-in dev tests using Django's test framework, run
 
 .. code-block:: sh
@@ -121,7 +124,7 @@ To run the built-in dev tests using Django's test framework, run
 
 Caveats
 -------------------
-Currently, FriendlyBots is IPv4 only.
+Currently, FriendlyBots has been designed only for IPv4. It *might* work for IPv6. One thing that comes to mind is that the address space for IPv6 is much bigger. Theoretically, this could cause IP address caching to become ineffective, and this could, in turn, result in huge numbers of DNS lookups.
 
 It may be possible to acquire access to restricted HTTP resources if a company owning an approved crawler is running an additional unapproved bot. For example, if Google runs a service and uses an unapproved bot, it might pass the credentials check if it operates under the same hostname (google.com).
 
