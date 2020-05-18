@@ -169,15 +169,8 @@ def search_bots_only():
     return real_decorator
 
 
-class FriendlyBotsView(TemplateView):
-    '''
-    Note: the "get" function also handles HEAD requests
-    '''
-
-    def get(self, request, *args, **kwargs):
-        remote_ip = request.META.get('REMOTE_ADDR')
-        user_agent = request.META.get('HTTP_USER_AGENT')
-        if is_good_bot(remote_ip, user_agent):
-            return super().get(self, request, *args, **kwargs)
-        else:
-            return HttpResponse(status=403)
+def FriendlyBots_as_view(**initkwargs):
+    """A function that blocks all requests with the exception of search
+    engines that are bot whitelisted and verified. It is to be used in
+    place of TemplateView.as_view."""
+    return search_bots_only()(TemplateView.as_view(**initkwargs))
