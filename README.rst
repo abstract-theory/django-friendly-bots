@@ -124,9 +124,9 @@ To run the built-in dev tests using Django's test framework, run
 
 Caveats
 -------------------
-Currently, FriendlyBots has been designed only for IPv4. It *might* work for IPv6. One thing that comes to mind is that the address space for IPv6 is much bigger. Theoretically, this could cause IP address caching to become ineffective, and this could, in turn, result in huge numbers of DNS lookups.
+Currently, FriendlyBots has been designed only for IPv4. It *might* work for IPv6. One thing that comes to mind is that the address space for IPv6 is much bigger. Theoretically, this could cause IP address caching to become ineffective, and this could, in turn, result in a DNS lookup for every bot that claims to be one of the friendly bots.
 
-It may be possible to acquire access to restricted HTTP resources if a company owning an approved crawler is running an additional unapproved bot. For example, if Google runs a service and uses an unapproved bot, it might pass the credentials check if it operates under the same hostname (google.com).
+It may be possible to acquire access to restricted HTTP resources if a company owning an approved crawler is running an additional unapproved bot. For example, if Google runs a service and uses an unapproved bot, it might pass the credentials check if it both operates under the same hostname (google.com) and contains the search engine ID string (Googlebot) in the user agent.
 
 Also, the validity of bot verification is wholly dependent on the companies that run the bots. For example, DuckDuckGo, could add additional IP addresses, or Bing could move hosts from search.msn.com to bing.com.
 
