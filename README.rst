@@ -91,16 +91,16 @@ This decorator will cause a status code of **403** to be returned to clients if 
         # do something
 
 
-FriendlyBotsView overrides TemplateView
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The TemplateView class has been overriden. Using the "as_view" function returns regular pages to approved and verified bots. For everyone else, it returns a status code of **403**. Usage of "FriendlyBotsView.as_view" is illustrated below.
+FriendlyBots_as_view instead of TemplateView.as_view
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The function FriendlyBots_as_view can be used in place of TemplateView.as_view. Using "FriendlyBots_as_view" returns regular pages to approved and verified bots. For everyone else, it returns a status code of **403**. Usage of the function is illustrated below.
 
 .. code-block:: python
 
-    from friendlybots.views import FriendlyBotsView
+    from friendlybots.views import FriendlyBots_as_view
 
     urlpatterns = [
-        re_path(r'^hello-friendly-bots/$', FriendlyBotsView.as_view(template_name='hello-friendly-bots.html')),
+        re_path(r'^hello-friendly-bots/$', FriendlyBots_as_view(template_name='hello-friendly-bots.html')),
     ]
 
 
