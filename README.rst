@@ -29,7 +29,7 @@ https://abstract-theory.github.io/notes-on-web-crawlers-for-2020.html
 
 Requirements
 ------------------------
-I've tested this on Django version 3.0+. I expect it to run on earlier versions.
+The included tests have been successfully run on Django versions 1.9, 2.0, 3.0.
 
 
 Installation
