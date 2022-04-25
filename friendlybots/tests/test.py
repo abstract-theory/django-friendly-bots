@@ -12,7 +12,7 @@ good_bots_user_agents = [
     ["66.249.79.207", 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/80.0.3987.92 Safari/537.36'],
     ["40.77.167.144", 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'],
     ['77.88.5.181', 'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)'],
-    ["54.208.102.37", "Mozilla/5.0 (compatible; DuckDuckGo-Favicons-Bot/1.0; +http://duckduckgo.com)"],
+    ["20.185.79.15", "Mozilla/5.0 (compatible; DuckDuckGo-Favicons-Bot/1.0; +http://duckduckgo.com)"],
     ["17.58.100.38", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/8.0.2 Safari/600.2.5 (Applebot/0.1; +http://www.apple.com/go/applebot)"],
 ]
 
