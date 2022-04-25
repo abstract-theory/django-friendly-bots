@@ -4,6 +4,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 import os
 
+# A function to be tested
 from ..views import is_good_bot
 
 # Good bots (tracable IPs and identifiable user agents)
@@ -32,9 +33,43 @@ TEST_TEMPLATES = [
     },
 ]
 
+@override_settings(ROOT_URLCONF="friendlybots.tests.urls", TEMPLATES=TEST_TEMPLATES)
+class DualViewTests(TestCase):
+    """Test the function that loads templates directly from URL router."""
+
+    # good bots must reach the bot_template_name.
+    def test_good_bots(self):
+        for item in good_bots_user_agents:
+            res = self.client.get('/test_dual_view/', REMOTE_ADDR=item[0], HTTP_USER_AGENT=item[1])
+            self.assertTrue(b"Hello Friendly Bots" in res.content)
+
+    # bad bots must reach the template_name.
+    def test_bad_bots(self):
+        for item in bad_bots_user_agents:
+            res = self.client.get('/test_dual_view/', REMOTE_ADDR=item[0], HTTP_USER_AGENT=item[1])
+            self.assertTrue(b"Hello Enemies" in res.content)
+
+
+@override_settings(ROOT_URLCONF="friendlybots.tests.urls", TEMPLATES=TEST_TEMPLATES)
+class TagBotTests(TestCase):
+    """Test the function that loads templates directly from URL router."""
+
+    # template must be rendered for friendly bots.
+    def test_good_bots(self):
+        for item in good_bots_user_agents:
+            res = self.client.get('/test_bot_tag/', REMOTE_ADDR=item[0], HTTP_USER_AGENT=item[1])
+            self.assertTrue(b"Hello Friendly Bots" in res.content)
+
+    # template must be rendered for everything that is not a friendly bot.
+    def test_bad_bots(self):
+        for item in bad_bots_user_agents:
+            res = self.client.get('/test_bot_tag/', REMOTE_ADDR=item[0], HTTP_USER_AGENT=item[1])
+            self.assertTrue(b"Hello Enemies" in res.content)
+
 
 @override_settings(ROOT_URLCONF="friendlybots.tests.urls", TEMPLATES=TEST_TEMPLATES)
 class AsViewTests(TestCase):
+    """Test the function that loads templates directly from URL router."""
 
     # good bots must reach the template.
     def test_good_bots_template_as_view(self):
@@ -51,6 +86,7 @@ class AsViewTests(TestCase):
 
 @override_settings(ROOT_URLCONF="friendlybots.tests.urls", TEMPLATES=TEST_TEMPLATES)
 class DecoratorTests(TestCase):
+    """Test the view function decorator."""
 
     # good bots must reach view function
     def test_good_bot_bypass_decorator(self):
@@ -65,18 +101,4 @@ class DecoratorTests(TestCase):
         for item in bad_bots_user_agents:
             res = self.client.get('/test_view_decorator/', REMOTE_ADDR=item[0], HTTP_USER_AGENT=item[1])
             self.assertEqual(res.status_code, 403)
-
-
-class FriendlyBotFuncTests(TestCase):
-
-    # good bots must NOT show up in the event log.
-    def test_good_bot_bypass_lambda(self):
-        for remote_ip, user_agent in good_bots_user_agents:
-            assert(is_good_bot(remote_ip, user_agent) == True)
-
-    # fake bots must show up in the event log.
-    def test_bad_bot_event_lambda(self):
-        for remote_ip, user_agent in bad_bots_user_agents:
-            assert(is_good_bot(remote_ip, user_agent) == False)
-
 
