@@ -24,22 +24,22 @@ CACHE_NAME = 'friendly_bots'
 app_cache = caches[CACHE_NAME]
 
 
-# IPs used by DuckDuckBot
+# IPs used by DuckDuckBot (last update: 220315)
 DUCKDUCKBOT_IPS = [
     '20.191.45.212',
-    '23.21.227.69',
     '40.88.21.235',
-    '50.16.241.113',
-    '50.16.241.114',
-    '50.16.241.117',
-    '50.16.247.234',
-    '52.5.190.19',
-    '52.204.97.54',
-    '54.197.234.188',
-    '54.208.100.253',
-    '54.208.102.37',
-    '107.21.1.8',
+    '40.76.173.151',
+    '40.76.163.7',
+    '20.185.79.47',
+    '52.142.26.175',
+    '20.185.79.15',
+    '52.142.24.149',
+    '40.76.162.208',
+    '40.76.163.23',
+    '40.76.162.191',
+    '40.76.162.247',
 ]
+
 
 # Bots with known IP addresses
 # Use a set instead of a list if there is a large number of IPs
@@ -81,8 +81,7 @@ UA_IDS = [
 
 
 def ip_query(remote_ip):
-    """
-    Returns true if the forwards IP lookup of the reverse IP lookup
+    """Returns true if the forwards IP lookup of the reverse IP lookup
     gives us the remote_ip. As of 2020-04-01, this is the standard
     method for Google and Bing. It also works with Yandex and Seznam,
     and probably AppleBot.
@@ -110,18 +109,21 @@ def ip_query(remote_ip):
     return res
 
 
-def is_good_bot(remote_ip, user_agent):
-    """
-    Checks that bot is approved and then verifies bot with reverse and
-    forwards DNS lookups.
+# def is_good_bot(remote_ip, user_agent):
+def is_good_bot(request):
+    """Checks that bot is approved and then verifies bot with reverse
+    and forwards DNS lookups.
 
     args
-        remote_ip: IP address
-        user_agent: user agent string
+        request: A Django request object.
 
     return
         res: True or False
     """
+
+    remote_ip = request.META.get('REMOTE_ADDR')
+    user_agent = request.META.get('HTTP_USER_AGENT')
+
     # return False if this is not a bot/IP that we are watching for
     res = False
 
@@ -155,14 +157,12 @@ def is_good_bot(remote_ip, user_agent):
 
 
 def search_bots_only():
-    """
-    A view decorator which blocks all requests with the exception of search engines that are bot whitelisted and verified.
+    """A view decorator which blocks all requests with the exception of
+    search engines that are bot whitelisted and verified.
     """
     def real_decorator(viewFunc):
         def wrapper(request, *args, **kwargs):
-            remote_ip = request.META.get('REMOTE_ADDR')
-            user_agent = request.META.get('HTTP_USER_AGENT')
-            if is_good_bot(remote_ip, user_agent):
+            if is_good_bot(request):
                 result = viewFunc(request, *args, **kwargs)
             else:
                 result = HttpResponse(status=403)
@@ -176,3 +176,45 @@ def FriendlyBots_as_view(**initkwargs):
     engines that are bot whitelisted and verified. It is to be used in
     place of TemplateView.as_view."""
     return search_bots_only()(TemplateView.as_view(**initkwargs))
+
+
+class FriendlyBotsDualView(TemplateView):
+    '''Returns the template "bot_template_name" for search engines that
+    are bothe whitelisted and verified. All other requests are directed
+    to "template_name".
+
+    Usage:
+        FriendlyBotsDualView.as_view(
+            template_name='contact/contact.html',
+            bot_template_name='index.html'
+        )
+
+    Note: the "get" function also handles HEAD requests
+    '''
+    bot_template_name = None
+    def __init__(self, *args, bot_template_name=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bot_template_name = bot_template_name
+    def get(self, request, *args, **kwargs):
+        if is_good_bot(request):
+            self.template_name = self.bot_template_name
+        return super().get(self, request, *args, **kwargs)
+
+
+class TagFriendlyBotsView(TemplateView):
+    '''Sets the template variable "is_friendly_bot" to True if the
+    requester is a friendly bot.
+
+    Usage:
+        FriendlyBotsDualView.as_view(
+            template_name=template_name,
+        )
+
+    Note: the "get" function also handles HEAD requests
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        is_friendly_bot = is_good_bot(request)
+        return super().get(self, request, *args, is_friendly_bot=is_friendly_bot, **kwargs)
+
