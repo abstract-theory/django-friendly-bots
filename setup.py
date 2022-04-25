@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-friendly-bots',
-    version='1.1',
+    version='1.2',
     packages=find_packages(),
     include_package_data=True,
     license='GNU GPLv3',  # example license
@@ -17,7 +17,7 @@ setup(
     long_description=("A Django app to limit view function access to only approved and verified crawlers. "
                       "By default, the approved crawlers are: Google, Bing, Msnbot, Yandex, Seznam, AppleBot, and DuckDuckGo. "
                       "All crawlers are verified by either reverse and forwards DNS lookups or by having a white-listed IP address. "
-                      "Crawler verification is subject to change, but works as of 2020, April 4th."),
+                      "Watch your logs. Crawler verification methods require that crawlers keep doing things in a certain way."),
     long_description=README,
     url='https://github.com/abstract-theory',
     author='',
@@ -30,6 +30,7 @@ setup(
         'Framework :: Django :: 2.1',
         'Framework :: Django :: 2.2',
         'Framework :: Django :: 3.0',
+        'Framework :: Django :: 4.0',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU GPLv3',
         'Operating System :: OS Independent',

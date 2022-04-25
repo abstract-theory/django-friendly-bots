@@ -29,7 +29,7 @@ https://abstract-theory.github.io/notes-on-web-crawlers-for-2020.html
 
 Requirements
 ------------------------
-The included tests have been successfully run on Django versions 1.9, 2.0, 3.0.
+The included tests have been run successfully on the following Django versions: 1.9, 2.0, 3.0, 4.0.
 
 
 Installation
@@ -78,12 +78,13 @@ Django-Friendly-Bots uses Django's caching suite to store IP addresses and wheth
 Usage
 -----
 
-The view function decorator
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-This decorator will cause a status code of **403** to be returned to clients if the client is not an approved and verified search engine crawler. The decorator is placed above view functions as shown below.
+Protecting View Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The decorator, **@search_bots_only()** will cause a status code of **403** to be returned to clients if the client is not an approved and verified search engine crawler. The decorator is placed above view functions as shown below.
 
 .. code-block:: python
 
+    # views.py
     from friendlybots.views import search_bots_only
 
     @search_bots_only()
@@ -91,22 +92,79 @@ This decorator will cause a status code of **403** to be returned to clients if 
         # do something
 
 
-FriendlyBots_as_view instead of TemplateView.as_view
+Protecting Templates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The function FriendlyBots_as_view can be used in place of TemplateView.as_view. Using "FriendlyBots_as_view" returns regular pages to approved and verified bots. For everyone else, it returns a status code of **403**. Usage of the function is illustrated below.
+The function **FriendlyBots_as_view** can be used in place of TemplateView.as_view. Using **FriendlyBots_as_view** returns regular pages to approved and verified bots **403** for everyone else. Usage of the function is illustrated below.
 
 .. code-block:: python
 
+    # urls.py
     from friendlybots.views import FriendlyBots_as_view
 
     urlpatterns = [
-        re_path(r'^hello-friendly-bots/$', FriendlyBots_as_view(template_name='hello-friendly-bots.html')),
+        re_path(
+            r'^test_as_view/$',
+            FriendlyBots_as_view(
+                template_name='hello-friendly-bots.html'
+            )
+        ),
     ]
+
+Serving Two Templates from One URL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The method **FriendlyBotsDualView.as_view** can be used in place of TemplateView.as_view. Using **FriendlyBotsDualView.as_view** will use one of two templates depending on whether or not the requester is an approved and verified bot. Usage of this method is illustrated below.
+
+.. code-block:: python
+
+    # urls.py
+    from friendlybots.views import FriendlyBotsDualView
+
+    urlpatterns = [
+        re_path(
+            r'^hello-friendly-bots/$',
+            FriendlyBotsDualView.as_view(
+                template_name='hello-enemies.html',
+                bot_template_name='hello-friendly-bots.html'
+            )
+        ),
+    ]
+
+
+Identifying Friendly Bots with a Template Variable
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The method **TagFriendlyBotsView.as_view** can be used in place of TemplateView.as_view. Using **TagFriendlyBotsView.as_view** passes a boolean value to templates that depends on whether or not the requester is an approved and verified bot. Usage of this method is illustrated below.
+
+.. code-block:: python
+
+    # urls.py
+    from friendlybots.views import TagFriendlyBotsView
+
+    urlpatterns = [
+        re_path(
+            r'^hello-friendly-bots/$',
+            TagFriendlyBotsView.as_view(
+                template_name='hello-somebody.html',
+            )
+        ),
+    ]
+
+.. code-block:: html
+
+    <!-- hello-somebody.html -->
+    <html>
+        <body>
+            {% if is_friendly_bot %}
+                <h1>Hello Friendly Bots!</h1>
+            {% else %}
+                <h1>Hello Scrapers!</h1>
+            {% endif %}
+        </body>
+    </html>
 
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
-If for any reason IPs are incorrectly labels as good or bad bots (e.g. a search engine changes IP addresses), the cached IP addresses can be deleted with a management command. This is illustrated below.
+If, for any reason, IPs are incorrectly labels as good or bad bots (e.g. a search engine changes IP addresses), the cached IP addresses can be deleted with a management command. This is illustrated below.
 
 .. code-block:: sh
 
@@ -124,9 +182,11 @@ To run the built-in dev tests using Django's test framework, run
 
 Caveats
 -------------------
-Currently, FriendlyBots has been designed only for IPv4. It *might* work for IPv6. One thing that comes to mind is that the address space for IPv6 is much bigger. Theoretically, this could cause IP address caching to become ineffective, and this could, in turn, result in a DNS lookup for every bot that claims to be one of the friendly bots.
+Currently, FriendlyBots has been designed only for IPv4. It *might* work for IPv6. One thing that comes to mind is that the address space for IPv6 is much bigger. If bots started using massive ranges of IP addresses, this could cause the IP address caching strategy to become ineffective.
 
-It may be possible to acquire access to restricted HTTP resources if a company owning an approved crawler is running an additional unapproved bot. For example, if Google runs a service and uses an unapproved bot, it might pass the credentials check if it both operates under the same hostname (google.com) and contains the search engine ID string (Googlebot) in the user agent.
+It may be possible to acquire access to restricted HTTP resources if a company owning an approved crawler is also running an additional unapproved bot. A bot will pass the credentials check if it both operates under one of the GOOD_BOTS_HOSTNAMES and its user-agent string contains one of the string in either UA_BLOCKS_IDS or UA_IDS.
 
-Also, the validity of bot verification is wholly dependent on the companies that run the bots. For example, DuckDuckGo, could add additional IP addresses, or Bing could move hosts from search.msn.com to bing.com.
+Also, the validity of bot verification is wholly dependent on the companies that run the bots. For example, Bing could move hosts from search.msn.com to bing.com.
+
+Note: DuckDuckGo has changed their crawler's IP addresses a couple of times recently. Addresses are current as of 2022-04-25. To change IPs, edit the variable "DUCKDUCKBOT_IPS" in "views.py".
 
